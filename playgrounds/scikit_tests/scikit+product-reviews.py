@@ -15,15 +15,15 @@ if __name__ == '__main__':
     traintargets = data[1]
     testdata = data[2]
     testtargets = data[3]
-    # text_clf = Pipeline([('vect', CountVectorizer(ngram_range=(1,1))),
-    #                      ('tfidf', TfidfTransformer(use_idf=False)),
-    #                      ('clf', SGDClassifier(loss='hinge', penalty='l2',
-    #                                            alpha=1e-3, n_iter=5, random_state=42, n_jobs=-1)),
-    #                      ])
-    text_clf = Pipeline([('vect', CountVectorizer(ngram_range=(1, 1))),
+    text_clf = Pipeline([('vect', CountVectorizer(ngram_range=(1,1))),
                          ('tfidf', TfidfTransformer(use_idf=False)),
-                         ('clf', svm.SVC()),
+                         ('clf', SGDClassifier(loss='hinge', penalty='l2',
+                                               alpha=1e-3, n_iter=5, random_state=42, n_jobs=-1)),
                          ])
+    # text_clf = Pipeline([('vect', CountVectorizer(ngram_range=(1, 1))),
+    #                      ('tfidf', TfidfTransformer(use_idf=False)),
+    #                      ('clf', svm.SVC()),
+    #                      ])
     _ = text_clf.fit(traindata, traintargets)
     predicted = text_clf.predict(testdata)
     print('+: '+str(predicted.tolist().count('+')))
