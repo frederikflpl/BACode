@@ -34,8 +34,8 @@ if __name__ == '__main__':
     print(metrics.classification_report(testtargets, predicted,
                                         target_names=['+', '-']))
     print(metrics.confusion_matrix(testtargets, predicted))
-    print(text_clf.predict(['I love it.']))
-    print(text_clf.predict(['I hate it.']))
+    print(text_clf.predict(['I love this product.']))
+    print(text_clf.predict(['I hate this product.']))
     # parameters = {'vect__ngram_range': [(1, 1), (1, 2)],
     #               'tfidf__use_idf': (True, False),
     #               'clf__alpha': (1e-2, 1e-3),

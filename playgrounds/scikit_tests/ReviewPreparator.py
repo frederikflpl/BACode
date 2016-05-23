@@ -7,7 +7,8 @@ testfeats = []
 testtargets = []
 
 def prepareReviews():
-    aspects = AspectFinder.find_aspects()
+    aspectfinder = AspectFinder.AspectFinder()
+    aspects = aspectfinder.get_aspects()
 
     minus = [f for f in aspects if f[1][0] == "-"]
     plus = [f for f in aspects if f[1][0] == "+"]
