@@ -7,16 +7,24 @@ testfeats = []
 testtargets = []
 
 def prepareReviews():
-    aspectfinder = AspectFinder.AspectFinder()
-    aspects = aspectfinder.get_aspects()
+    reviews = product_reviews_1.reviews()
+    reviewlines = []
+    for review in reviews:
+        for line in review.review_lines:
+            reviewlines.append(line)
 
-    minus = [f for f in aspects if f[1][0] == "-"]
-    plus = [f for f in aspects if f[1][0] == "+"]
-
-    sentences = [' '.join(s) for s in product_reviews_1.sents()]
-
-    minusfeatsann = [(s, '-') for s in sentences for f in minus if s.find(f[0]) != -1]
-    plusfeatsann = [(s, '+') for s in sentences for f in plus if s.find(f[0]) != -1]
+    # minusfeatsann = [(s, '-') for s in sentences for f in minus if s.find(f[0]) != -1]
+    # plusfeatsann = [(s, '+') for s in sentences for f in plus if s.find(f[0]) != -1]
+    sentfeats = [[(' '.join(line.sent), f[1][0]) for f in line.features] for line in reviewlines if
+                 len(line.features) > 0]
+    plusfeatsann = []
+    minusfeatsann = []
+    for sentfeat in sentfeats:
+        for feat in sentfeat:
+            if feat[1] == "+":
+                plusfeatsann.append(feat)
+            elif feat[1] == "-":
+                minusfeatsann.append(feat)
 
     if len(minusfeatsann)>len(plusfeatsann):
         minusfeatsann = minusfeatsann[:len(plusfeatsann)]

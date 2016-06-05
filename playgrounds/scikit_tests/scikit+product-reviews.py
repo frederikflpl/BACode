@@ -3,7 +3,7 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.pipeline import Pipeline
 import numpy as np
 from sklearn.linear_model import SGDClassifier
-from sklearn import metrics, svm
+from sklearn import metrics
 from sklearn.grid_search import GridSearchCV
 from sklearn.semi_supervised import label_propagation
 from scipy.sparse import csr_matrix
