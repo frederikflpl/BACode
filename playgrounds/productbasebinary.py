@@ -24,8 +24,6 @@ for sentfeat in sentfeats:
         elif feat[1] == "-":
             minusfeats.append(feat)
 
-
-
 if len(minusfeats) > len(plusfeats):
     minusfeats = minusfeats[:len(plusfeats)]
 else:

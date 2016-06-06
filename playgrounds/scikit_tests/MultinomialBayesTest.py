@@ -11,7 +11,7 @@ from sklearn.naive_bayes import MultinomialNB
 
 import playgrounds.scikit_tests.ReviewPreparator as revprep
 
-# accuracy 0.706989247312
+# accuracy 0.739247311828
 
 if __name__ == '__main__':
     data = revprep.prepareReviews()
@@ -20,9 +20,7 @@ if __name__ == '__main__':
     testdata = data[2]
     testtargets = data[3]
     text_clf = Pipeline([('vect', CountVectorizer(ngram_range=(1,2))),
-                         ('tfidf', TfidfTransformer(use_idf=True)),
-                         ('clf', SGDClassifier(loss='hinge', penalty='l2', alpha=1e-3, n_iter=5, random_state=42,
-                                                  n_jobs=-1)),
+                         ('clf', MultinomialNB()),
                          ])
     _ = text_clf.fit(traindata, traintargets)
     predicted = text_clf.predict(testdata)
@@ -37,8 +35,8 @@ if __name__ == '__main__':
     print(text_clf.predict(['I love this product.']))
     print(text_clf.predict(['I hate this product.']))
     # parameters = {'vect__ngram_range': [(1, 1), (1, 2)],
-    #               'tfidf__use_idf': (True, False),
-    #               'clf__alpha': (1e-2, 1e-3),
+    #               'clf__alpha': (1, 1.5),
+    #               'clf__fit_prior': (True, False),
     #               }
     # gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
     # gs_clf = gs_clf.fit(traindata, traintargets)
