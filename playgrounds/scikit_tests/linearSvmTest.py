@@ -11,7 +11,10 @@ from sklearn.naive_bayes import MultinomialNB
 
 import playgrounds.scikit_tests.ReviewPreparator as revprep
 
-# 0.712365591398 accuracy
+# 0.712365591398 accuracy without tfidf
+# accuracy 0.706989247312
+#-------------------------
+#same as sgdClassifier
 
 if __name__ == '__main__':
     data = revprep.prepareReviews()
@@ -20,6 +23,7 @@ if __name__ == '__main__':
     testdata = data[2]
     testtargets = data[3]
     text_clf = Pipeline([('vect', CountVectorizer(ngram_range=(1,2))),
+                         ('tfidf', TfidfTransformer(use_idf=True)),
                          ('clf', svm.LinearSVC()),
                          ])
     _ = text_clf.fit(traindata, traintargets)
