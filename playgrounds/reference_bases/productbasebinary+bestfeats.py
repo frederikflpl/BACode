@@ -114,6 +114,7 @@ for line in featlines:
         for word in line.sent:
             minuswords.append(word)
 
+
 for word in pluswords:
     word_fd[word.lower()]+=1
     label_word_fd['+'][word.lower()]+=1

@@ -12,6 +12,7 @@ from sklearn.naive_bayes import MultinomialNB
 import playgrounds.scikit_tests.ReviewPreparator as revprep
 
 # accuracy 0.739247311828
+# accuracy 0.806451612903 with feature selection
 
 if __name__ == '__main__':
     data = revprep.prepareReviews()
@@ -19,8 +20,8 @@ if __name__ == '__main__':
     traintargets = data[1]
     testdata = data[2]
     testtargets = data[3]
-    text_clf = Pipeline([('vect', CountVectorizer(ngram_range=(1,2))),
-                         ('clf', MultinomialNB()),
+    text_clf = Pipeline([('vect', CountVectorizer(ngram_range=(1,1))),
+                         ('clf', MultinomialNB(alpha=1.5,fit_prior=True)),
                          ])
     _ = text_clf.fit(traindata, traintargets)
     predicted = text_clf.predict(testdata)
@@ -35,7 +36,7 @@ if __name__ == '__main__':
     print(text_clf.predict(['I love this product.']))
     print(text_clf.predict(['I hate this product.']))
     # parameters = {'vect__ngram_range': [(1, 1), (1, 2)],
-    #               'clf__alpha': (1, 1.5),
+    #               'clf__alpha': (1, 1.5, 2),
     #               'clf__fit_prior': (True, False),
     #               }
     # gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)

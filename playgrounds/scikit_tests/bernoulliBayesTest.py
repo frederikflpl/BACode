@@ -1,21 +1,15 @@
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.pipeline import Pipeline
 import numpy as np
-from sklearn.linear_model import SGDClassifier
 from sklearn import metrics, svm
 from sklearn.grid_search import GridSearchCV
-from sklearn.semi_supervised import label_propagation
 from scipy.sparse import csr_matrix
-from sklearn.naive_bayes import MultinomialNB
+from sklearn.naive_bayes import BernoulliNB
 
 import playgrounds.scikit_tests.ReviewPreparator as revprep
 
-# 0.712365591398 accuracy without tfidf
-# accuracy 0.706989247312
-# accuracy 0.798387096774 with best features
-#-------------------------
-#same as sgdClassifier
+# accuracy 0.739247311828
+# accuracy 0.809139784946 with feature selection
 
 if __name__ == '__main__':
     data = revprep.prepareReviews()
@@ -23,9 +17,8 @@ if __name__ == '__main__':
     traintargets = data[1]
     testdata = data[2]
     testtargets = data[3]
-    text_clf = Pipeline([('vect', CountVectorizer(ngram_range=(1,1))),
-                         ('tfidf', TfidfTransformer(use_idf=True)),
-                         ('clf', svm.LinearSVC(C=1,loss='hinge',max_iter=10,tol=1e-5)),
+    text_clf = Pipeline([('vect', CountVectorizer(ngram_range=(1,1),binary=True)),
+                         ('clf', BernoulliNB(alpha=1,fit_prior=True)),
                          ])
     _ = text_clf.fit(traindata, traintargets)
     predicted = text_clf.predict(testdata)
@@ -40,12 +33,8 @@ if __name__ == '__main__':
     print(text_clf.predict(['I love this product.']))
     print(text_clf.predict(['I hate this product.']))
     # parameters = {'vect__ngram_range': [(1, 1), (1, 2)],
-    #               'clf__C': (1e-1, 1, 1.5),
-    #               'clf__loss': ("hinge", "squared_hinge"),
-    #               #'clf__penalty': ("l1", "l2"),
-    #               #'clf__dual': (True, False),
-    #               'clf__tol': (1e-5, 1e-4, 1e-3),
-    #               'clf__max_iter': (10, 100, 1000),
+    #               'clf__alpha': (1, 1.5, 2),
+    #               'clf__fit_prior': (True, False),
     #               }
     # gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
     # gs_clf = gs_clf.fit(traindata, traintargets)

@@ -1,5 +1,6 @@
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.feature_selection import SelectKBest, chi2
 from sklearn.pipeline import Pipeline
 import numpy as np
 from sklearn.linear_model import SGDClassifier
@@ -12,6 +13,7 @@ from sklearn.naive_bayes import MultinomialNB
 import playgrounds.scikit_tests.ReviewPreparator as revprep
 
 # accuracy 0.706989247312
+# accuracy 0.798387096774 with best features
 
 if __name__ == '__main__':
     data = revprep.prepareReviews()
@@ -19,7 +21,7 @@ if __name__ == '__main__':
     traintargets = data[1]
     testdata = data[2]
     testtargets = data[3]
-    text_clf = Pipeline([('vect', CountVectorizer(ngram_range=(1,2))),
+    text_clf = Pipeline([('vect', CountVectorizer(ngram_range=(1,1))),
                          ('tfidf', TfidfTransformer(use_idf=True)),
                          ('clf', SGDClassifier(loss='hinge', penalty='l2', alpha=1e-3, n_iter=5, random_state=42,
                                                   n_jobs=-1)),
