@@ -1,6 +1,6 @@
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.pipeline import Pipeline
+from sklearn.pipeline import Pipeline, FeatureUnion
 import numpy as np
 from sklearn.linear_model import SGDClassifier
 from sklearn import metrics, svm
@@ -22,39 +22,37 @@ if __name__ == '__main__':
     traintargets = data[1]
     testdata = data[2]
     testtargets = data[3]
-    cvec1 = CountVectorizer(ngram_range=(1,1),analyzer="word")
-    cvec2 = CountVectorizer(ngram_range=(1,1),analyzer="char")
-    a_new_counts = cvec1.fit_transform(traindata)
-    b_new_counts = cvec2.fit_transform(traindata)
-    c_new_counts = hstack((a_new_counts, b_new_counts),format="csr")
-    clf = MultinomialNB(alpha=0.3).fit(c_new_counts,traintargets)
-    a_new_tcounts = cvec1.transform(testdata)
-    b_new_tcounts = cvec2.transform(testdata)
-    c_new_tcounts = hstack((a_new_tcounts, b_new_tcounts),format="csr")
-    predicted = clf.predict(c_new_tcounts)
-    print('+: '+str(predicted.tolist().count('+')))
-    print('-: '+str(predicted.tolist().count('-')))
-    print('+: '+str(testtargets.count('+')))
-    print('-: '+str(testtargets.count('-')))
+    text_clf = Pipeline([('vect', FeatureUnion([("word", CountVectorizer(ngram_range=(1, 2), analyzer="word")),
+                                                ("char", CountVectorizer(ngram_range=(1, 1), analyzer="char", ))])),
+                         ('clf', MultinomialNB(alpha=2, fit_prior=True)),
+                         ])
+    _ = text_clf.fit(traindata, traintargets)
+    predicted = text_clf.predict(testdata)
+    print('+: ' + str(predicted.tolist().count('+')))
+    print('-: ' + str(predicted.tolist().count('-')))
+    print('+: ' + str(testtargets.count('+')))
+    print('-: ' + str(testtargets.count('-')))
     print(np.mean(predicted == testtargets))
     print(metrics.classification_report(testtargets, predicted,
                                         target_names=['+', '-']))
     print(metrics.confusion_matrix(testtargets, predicted))
-    a_new_ccounts = cvec1.transform(['God is love','I love this product.','I hate this product.'])
-    b_new_ccounts = cvec2.transform(['God is love','I love this product.','I hate this product.'])
-    c_new_ccounts = hstack((a_new_ccounts, b_new_ccounts),format="csr")
-    print(clf.predict(c_new_ccounts))
+    print(text_clf.predict(['I love this product.']))
+    print(text_clf.predict(['I hate this product.']))
 
-    # parameters = {'alpha': (0.3,0.5,1),
-    #               'fit_prior': (True, False),
+    # parameters = {'vect__word__ngram_range': [(1, 1), (1, 2)],
+    #               'vect__char__ngram_range': [(1, 1), (1, 2)],
+    #               'clf__alpha': (1, 1.5, 2),
+    #               'clf__fit_prior': (True, False),
     #               }
-    # gs_clf = GridSearchCV(clf, parameters, n_jobs=-1)
-    # gs_clf = gs_clf.fit(c_new_counts, traintargets)
-    # print(gs_clf.predict(c_new_ccounts))
+    # gs_clf = GridSearchCV(text_clf, parameters, n_jobs=-1)
+    # gs_clf = gs_clf.fit(traindata, traintargets)
+    # print(gs_clf.predict(['God is love']))
+    # print(gs_clf.predict(['I love it.']))
+    # print(gs_clf.predict(['I hate it.']))
     # for param_name in sorted(gs_clf.best_params_.keys()):
     #     print("%s: %r" % (param_name, gs_clf.best_params_[param_name]))
     # print(gs_clf.best_score_)
-    # predicted = gs_clf.predict(c_new_tcounts)
+    # predicted = gs_clf.predict(testdata)
     # print('+: ' + str(predicted.tolist().count('+')))
     # print('-: ' + str(predicted.tolist().count('-')))
     # print('+: ' + str(testtargets.count('+')))
