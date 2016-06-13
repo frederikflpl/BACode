@@ -1,9 +1,10 @@
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
-from sklearn.pipeline import Pipeline
+from sklearn.naive_bayes import BernoulliNB, MultinomialNB
+from sklearn.pipeline import Pipeline, FeatureUnion
 import numpy as np
 from sklearn.linear_model import SGDClassifier
-from sklearn import metrics
+from sklearn import metrics, svm
 from sklearn.grid_search import GridSearchCV
 import playgrounds.scikit_tests.ReviewPreparator as revprep
 
@@ -57,15 +58,83 @@ def optimizeParameters(classifier, parameters):
 
 
 if __name__ == '__main__':
+    classifiers = [
+        (
+            "SGDClassifier",
+            (
+                Pipeline([('vect', CountVectorizer(ngram_range=(1, 1))),
+                          ('tfidf', TfidfTransformer(use_idf=True)),
+                          ('clf', SGDClassifier(loss='hinge', penalty='l2', alpha=1e-3, n_iter=5, random_state=42,
+                                                n_jobs=-1)),
+                          ]),
+                {'vect__ngram_range': [(1, 1), (1, 2)],
+                 'tfidf__use_idf': (True, False),
+                 'clf__alpha': (1e-2, 1e-3),
+                 }
+            )
+
+        ),
+        (
+            "BernoulliNB",
+            (
+                Pipeline([('vect', CountVectorizer(ngram_range=(1, 1), binary=True)),
+                          ('clf', BernoulliNB(alpha=1, fit_prior=True)),
+                          ]),
+                {'vect__ngram_range': [(1, 1), (1, 2)],
+                 'clf__alpha': (1, 1.5, 2),
+                 'clf__fit_prior': (True, False),
+                 }
+            )
+
+        ),
+        (
+            "LinearSVC",
+            (
+                Pipeline([('vect', CountVectorizer(ngram_range=(1, 1))),
+                          ('tfidf', TfidfTransformer(use_idf=True)),
+                          ('clf', svm.LinearSVC(C=1, loss='hinge', max_iter=10, tol=1e-5)),
+                          ]),
+                {'vect__ngram_range': [(1, 1), (1, 2)],
+                 'clf__C': (1e-1, 1, 1.5),
+                 'clf__loss': ("hinge", "squared_hinge"),
+                 'clf__tol': (1e-5, 1e-4, 1e-3),
+                 'clf__max_iter': (10, 100, 1000),
+                 }
+            )
+
+        ),
+        (
+            "MultinomialNB with word and character features",
+            (
+                Pipeline([('vect', FeatureUnion([("word", CountVectorizer(ngram_range=(1, 2), analyzer="word")),
+                                                 ("char", CountVectorizer(ngram_range=(1, 1), analyzer="char", ))])),
+                          ('clf', MultinomialNB(alpha=2, fit_prior=True)),
+                          ]),
+                {'vect__word__ngram_range': [(1, 1), (1, 2)],
+                 'vect__char__ngram_range': [(1, 1), (1, 2)],
+                 'clf__alpha': (1, 1.5, 2),
+                 'clf__fit_prior': (True, False),
+                 }
+            )
+
+        ),
+        (
+            "MultinomialNB",
+            (
+                Pipeline([('vect', CountVectorizer(ngram_range=(1, 1))),
+                          ('clf', MultinomialNB(alpha=1.5, fit_prior=True)),
+                          ]),
+                {'vect__ngram_range': [(1, 1), (1, 2)],
+                 'clf__alpha': (1, 1.5, 2),
+                 'clf__fit_prior': (True, False),
+                }
+            )
+        )
+    ]
     getData()
-    text_clf = Pipeline([('vect', CountVectorizer(ngram_range=(1,1))),
-                         ('tfidf', TfidfTransformer(use_idf=True)),
-                         ('clf', SGDClassifier(loss='hinge', penalty='l2', alpha=1e-3, n_iter=5, random_state=42,
-                                                  n_jobs=-1)),
-                         ])
-    fit_and_evaluate(text_clf)
-    parameters = {'vect__ngram_range': [(1, 1), (1, 2)],
-                  'tfidf__use_idf': (True, False),
-                  'clf__alpha': (1e-2, 1e-3),
-                  }
-    optimizeParameters(text_clf,parameters)
+    for classifier in classifiers:
+        print("\n\n",classifier[0])
+        text_clf = classifier[1][0]
+        parameters = classifier[1][1]
+        fit_and_evaluate(text_clf)
+        #optimizeParameters(text_clf,parameters)
