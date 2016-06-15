@@ -31,7 +31,7 @@ def fit_and_evaluate(classifier):
     print('-: ' + str(testtargets.count('-')))
     print(np.mean(predicted == testtargets))
     print(metrics.classification_report(testtargets, predicted,
-                                        target_names=['+', '-']))
+                                        target_names=['+', '-', '~']))
     print(metrics.confusion_matrix(testtargets, predicted))
     print('I love this product. : ',classifier.predict(['I love this product.']))
     print('I hate this product. : ',classifier.predict(['I hate this product.']))
@@ -90,7 +90,7 @@ if __name__ == '__main__':
         (
             "LinearSVC",
             (
-                Pipeline([('vect', CountVectorizer(ngram_range=(1, 1))),
+                Pipeline([('vect', CountVectorizer(ngram_range=(1, 2))),
                           ('tfidf', TfidfTransformer(use_idf=True)),
                           ('clf', svm.LinearSVC(C=1, loss='hinge', max_iter=10, tol=1e-5)),
                           ]),
@@ -107,8 +107,8 @@ if __name__ == '__main__':
             "MultinomialNB with word and character features",
             (
                 Pipeline([('vect', FeatureUnion([("word", CountVectorizer(ngram_range=(1, 2), analyzer="word")),
-                                                 ("char", CountVectorizer(ngram_range=(1, 1), analyzer="char", ))])),
-                          ('clf', MultinomialNB(alpha=2, fit_prior=True)),
+                                                 ("char", CountVectorizer(ngram_range=(1, 2), analyzer="char", ))])),
+                          ('clf', MultinomialNB(alpha=1, fit_prior=True)),
                           ]),
                 {'vect__word__ngram_range': [(1, 1), (1, 2)],
                  'vect__char__ngram_range': [(1, 1), (1, 2)],
@@ -122,7 +122,7 @@ if __name__ == '__main__':
             "MultinomialNB",
             (
                 Pipeline([('vect', CountVectorizer(ngram_range=(1, 1))),
-                          ('clf', MultinomialNB(alpha=1.5, fit_prior=True)),
+                          ('clf', MultinomialNB(alpha=1, fit_prior=True)),
                           ]),
                 {'vect__ngram_range': [(1, 1), (1, 2)],
                  'clf__alpha': (1, 1.5, 2),
