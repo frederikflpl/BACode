@@ -9,8 +9,8 @@ from sklearn.grid_search import GridSearchCV
 import playgrounds.scikit_tests.ReviewPreparator as revprep
 
 
-def getData():
-    data = revprep.prepareReviews()
+def getData(neutral=False):
+    data = revprep.prepareReviews(neutral)
     global traindata, traintargets, testdata, testtargets
     traindata = data[0]
     traintargets = data[1]
