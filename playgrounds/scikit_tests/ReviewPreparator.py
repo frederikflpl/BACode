@@ -11,7 +11,7 @@ def prepareReviews(neutral=False):
 
     # minusfeatsann = [(s, '-') for s in sentences for f in minus if s.find(f[0]) != -1]
     # plusfeatsann = [(s, '+') for s in sentences for f in plus if s.find(f[0]) != -1]
-    best = bestWords()
+    best = bestWords(neutral)
     sentfeats = [[(' '.join(bestfeats(line.sent,best)), f[1][0]) for f in line.features] for line in reviewlines if
                  len(line.features) > 0]
     plusfeatsann = []
@@ -65,7 +65,7 @@ def prepareReviews(neutral=False):
     return [trainfeats, traintargets, testfeats, testtargets]
 
 
-def bestWords(neutral=False):
+def bestWords(neutral):
     word_fd = FreqDist()
     label_word_fd = ConditionalFreqDist()
 
